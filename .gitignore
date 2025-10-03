@@ -209,4 +209,4 @@ __marimo__/
 .env
 *.parquet
 data/
-.sh
+*.sh
