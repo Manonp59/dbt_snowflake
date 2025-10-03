@@ -1,84 +1,132 @@
-models: 
+version: 2
+
+models:
   - name: staging_nyc_taxis
     description: "Staging table for NYC taxis data"
     columns:  
       - name: airport_fee
-        description: $5.00 airport fee that is automatically triggered based on the
-          metered fare amount for trips to/from JFK and LaGuardia airports.
+        description: "$5.00 airport fee for trips to/from JFK and LaGuardia."
         data_type: FLOAT
+
       - name: congestion_surcharge
-        description: $2.50 congestion surcharge assessed on trips that originate,
-          terminate, or pass through the Manhattan congestion pricing zone.
+        description: "$2.50 congestion surcharge for Manhattan congestion zone trips."
         data_type: FLOAT
+
       - name: pu_location_id
-        description: The pick-up location ID. A code representing the location where
-          the passenger entered the taxi.
+        description: "Pick-up location ID."
         data_type: INT
+        tests:
+          - not_null
+
       - name: do_location_id
-        description: The drop-off location ID. A code representing the location where
-          the passenger exited the taxi.  
+        description: "Drop-off location ID."
         data_type: INT
+        tests:
+          - not_null
+
       - name: extra
-        description: Miscellaneous extras and surcharges. Currently, this only includes the $0.50 MTA tax.  
+        description: "Miscellaneous extras and surcharges (e.g., $0.50 MTA tax)."
         data_type: FLOAT
+        tests:
+          - not_null
+
       - name: fare_amount
-        description: The time-and-distance fare calculated by the meter.  
+        description: "Time-and-distance fare calculated by the meter."
         data_type: FLOAT
+        tests:
+          - not_null
+
       - name: improvement_surcharge
-        description: improvement surcharge assessed on each trip.
+        description: "Improvement surcharge assessed on each trip."
         data_type: FLOAT
+        tests:
+          - not_null
+
       - name: mta_tax
-        description: $0.50 MTA tax that is automatically triggered based on the metered
-          fare amount. 
-        data_type: FLOAT   
+        description: "$0.50 MTA tax automatically triggered."
+        data_type: FLOAT
+        tests:
+          - not_null
+
       - name: passenger_count
-        description: The number of passengers in the vehicle. This is a driver-entered value. 
+        description: "Number of passengers in the vehicle."
         data_type: INT
-      - name: payment_type    
-        description: A numeric code signifying how the passenger paid for the trip. 
+
+      - name: payment_type
+        description: "Numeric code for payment type."
         data_type: INT
+        tests:
+          - not_null
+
       - name: ratecode_id
-        description: The final rate code in effect at the end of the trip. 
-        data_type: INT 
+        description: "Final rate code in effect at the end of the trip."
+        data_type: INT
+
       - name: store_and_fwd_flag
-        description: This flag indicates whether the trip record was held in vehicle memory before sending to the vendor, 
-          or whether the trip record was sent immediately to the vendor at the end of the trip. 
+        description: "Indicates whether the trip record was held in vehicle memory before sending."
         data_type: STRING
+
       - name: tip_amount
-        description: Tip amount – This field is automatically populated for credit card
-          tips. Cash tips are not included.  
+        description: "Tip amount automatically populated for credit card tips."
         data_type: FLOAT
+        tests:
+          - not_null
+
       - name: tolls_amount
-        description: Total amount of all tolls paid in trip.
+        description: "Total amount of all tolls paid in trip."
         data_type: FLOAT
+        tests:
+          - not_null
+
       - name: total_amount
-        description: The total amount charged to passengers. Does not include cash tips.  
+        description: "Total amount charged to passengers (excluding cash tips)."
         data_type: FLOAT
+        tests:
+          - not_null
+
       - name: tpep_dropoff_datetime
-        description: The date and time when the meter was disengaged.
+        description: "Date and time when the meter was disengaged."
         data_type: TIMESTAMP
+        tests:
+          - not_null
+
       - name: tpep_pickup_datetime
-        description: The date and time when the meter was engaged.
+        description: "Date and time when the meter was engaged."
         data_type: TIMESTAMP
+        tests:
+          - not_null
+
       - name: trip_distance
-        description: The elapsed trip distance
+        description: "Elapsed trip distance."
         data_type: FLOAT
+        tests:
+          - not_null
+
       - name: vendor_id
-        description: A code indicating the TLC vendor that provided the record.
+        description: "TLC vendor code."
         data_type: INT
+        tests:
+          - not_null
+
       - name: cbd_congestion_fee
-        description: The congestion fee amount for trips that originate, terminate, or pass through the
-          Manhattan congestion pricing zone. This fee is in addition to the $2.50 congestion surcharge. 
+        description: "Additional congestion fee in Manhattan."
         data_type: FLOAT
+
       - name: trip_duration
-        description: The duration of the trip in minutes, calculated as the difference between
-          tpep_dropoff_datetime and tpep_pickup_datetime.
+        description: "Duration of the trip in minutes."
         data_type: FLOAT
+        tests:
+          - not_null
+
       - name: trip_speed
-        description: The average speed of the trip in miles per hour, calculated as
-          (trip_distance / trip_duration) * 60.
+        description: "Average speed in miles per hour."
         data_type: INT
+        tests:
+          - not_null
+
       - name: tip_ratio_pct
-        description: The ratio of tip_amount to fare_amount, expressed as a percentage.
+        description: "Ratio of tip_amount to fare_amount as a percentage."
         data_type: FLOAT
+
+
       

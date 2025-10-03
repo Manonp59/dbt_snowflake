@@ -23,6 +23,9 @@ default_args = {
 }
 
 def extract_and_upload_to_blob(**kwargs):
+    """
+    Description: Function to extract NYC taxi data and upload it to Azure Blob Storage.
+    """
     # Paramètres Azure Blob
     hook = WasbHook(wasb_conn_id="azure_storage_conn")
     blob_service_client = hook.blob_service_client
@@ -37,8 +40,8 @@ def extract_and_upload_to_blob(**kwargs):
     os.makedirs(output_dir, exist_ok=True)
 
     # Définir la période à télécharger
-    start_year = 2024
-    start_month = 1
+    start_year = 2023
+    start_month = 11
 
     today = date.today()
     current_year = today.year
@@ -53,19 +56,23 @@ def extract_and_upload_to_blob(**kwargs):
         url = base_url + filename
         output_path = os.path.join(output_dir, filename)
 
-        print(f"Téléchargement de {url}...")
-        r = requests.get(url, verify=False)
-        if r.status_code == 200:
-            print(f"Téléversement de {filename} vers Azure Blob Storage...")
-            with open(output_path, "wb") as f:
-                f.write(r.content)
-            blob_client = container_client.get_blob_client(blob=filename)
-            blob_client.upload_blob(data=open(output_path, "rb"), overwrite=True, max_concurrency=4, timeout=3600, connection_timeout=3600)
-            print(f"{filename} téléversé avec succès sur Azure.")
+    
+        blob_client = container_client.get_blob_client(blob=filename)
+        if blob_client.exists():
+            print(f"{filename} already exists in Azure Blob Storage. Skipping upload.")
         else:
-            print(f"Échec pour {filename}. Code retour : {r.status_code}")
+            print(f"Downloading {url}...")
+            r = requests.get(url, verify=False)
+            if r.status_code == 200:
+                print(f"Uploading {filename} to Azure Blob Storage...")
+                with open(output_path, "wb") as f:
+                    f.write(r.content)
+                
+                blob_client.upload_blob(data=open(output_path, "rb"), overwrite=True, max_concurrency=4, timeout=3600, connection_timeout=3600)
+                print(f"{filename} uploaded successfully on Azure.")
+            else:
+                print(f"Failed to download {filename}. Status code: {r.status_code}")
 
-        # Passer au mois suivant
         if month == 12:
             month = 1
             year += 1
@@ -80,17 +87,40 @@ with DAG(
     schedule="@monthly",  # Exécution mensuelle
     catchup=False,
     tags=["nyc_taxi"],
+    doc_md="""
+    # NYC Taxi Workflow DAG
+
+    This DAG performs the complete workflow for NYC Taxi data:
+
+    1. Download monthly taxi trip Parquet files from the official NYC Taxi source.
+    2. Upload the files to Azure Blob Storage.
+    3. Create and populate the raw table in Snowflake.
+    4. Trigger dbt transformations to staging and final models.
+    """
 ) as dag:
 
     extract_task = PythonOperator(
         task_id="extract_and_upload",
         python_callable=extract_and_upload_to_blob,
+        doc_md="""
+        ## Extract and Upload Task
+
+        - Downloads monthly NYC Yellow Taxi Parquet files.
+        - Saves files locally in the `data/` directory.
+        - Uploads files to Azure Blob Storage container `nyc-taxi`.
+        """
     )
 
     create_table = SQLExecuteQueryOperator(
         task_id="create_raw_table",
         conn_id="snowflake_conn",
-        sql="sql/create_raw_table.sql"
+        sql="sql/create_raw_table.sql",
+        doc_md="""
+        ## Create Raw Table Task
+
+        - Creates the table `raw.yellow_taxi_trips` if it does not exist.
+        - Infers schema automatically from Parquet files using `INFER_SCHEMA`.
+        """
     )
     
     profile_config = ProfileConfig(
@@ -103,10 +133,11 @@ with DAG(
     )
     
     transform_data = DbtTaskGroup(
-        group_id="transform_data",
+        group_id="dbt_run",
         project_config=ProjectConfig("/usr/local/airflow/dags/dbt/nyc_taxis",),
         profile_config=profile_config,
         execution_config=ExecutionConfig(dbt_executable_path=f"{os.environ['AIRFLOW_HOME']}/dbt_venv/bin/dbt",),
+        operator_args={"install_deps": True}
 
     )
     
