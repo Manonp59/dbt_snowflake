@@ -1,0 +1,84 @@
+models: 
+  - name: staging_nyc_taxis
+    description: "Staging table for NYC taxis data"
+    columns:  
+      - name: airport_fee
+        description: $5.00 airport fee that is automatically triggered based on the
+          metered fare amount for trips to/from JFK and LaGuardia airports.
+        data_type: FLOAT
+      - name: congestion_surcharge
+        description: $2.50 congestion surcharge assessed on trips that originate,
+          terminate, or pass through the Manhattan congestion pricing zone.
+        data_type: FLOAT
+      - name: pu_location_id
+        description: The pick-up location ID. A code representing the location where
+          the passenger entered the taxi.
+        data_type: INT
+      - name: do_location_id
+        description: The drop-off location ID. A code representing the location where
+          the passenger exited the taxi.  
+        data_type: INT
+      - name: extra
+        description: Miscellaneous extras and surcharges. Currently, this only includes the $0.50 MTA tax.  
+        data_type: FLOAT
+      - name: fare_amount
+        description: The time-and-distance fare calculated by the meter.  
+        data_type: FLOAT
+      - name: improvement_surcharge
+        description: improvement surcharge assessed on each trip.
+        data_type: FLOAT
+      - name: mta_tax
+        description: $0.50 MTA tax that is automatically triggered based on the metered
+          fare amount. 
+        data_type: FLOAT   
+      - name: passenger_count
+        description: The number of passengers in the vehicle. This is a driver-entered value. 
+        data_type: INT
+      - name: payment_type    
+        description: A numeric code signifying how the passenger paid for the trip. 
+        data_type: INT
+      - name: ratecode_id
+        description: The final rate code in effect at the end of the trip. 
+        data_type: INT 
+      - name: store_and_fwd_flag
+        description: This flag indicates whether the trip record was held in vehicle memory before sending to the vendor, 
+          or whether the trip record was sent immediately to the vendor at the end of the trip. 
+        data_type: STRING
+      - name: tip_amount
+        description: Tip amount – This field is automatically populated for credit card
+          tips. Cash tips are not included.  
+        data_type: FLOAT
+      - name: tolls_amount
+        description: Total amount of all tolls paid in trip.
+        data_type: FLOAT
+      - name: total_amount
+        description: The total amount charged to passengers. Does not include cash tips.  
+        data_type: FLOAT
+      - name: tpep_dropoff_datetime
+        description: The date and time when the meter was disengaged.
+        data_type: TIMESTAMP
+      - name: tpep_pickup_datetime
+        description: The date and time when the meter was engaged.
+        data_type: TIMESTAMP
+      - name: trip_distance
+        description: The elapsed trip distance
+        data_type: FLOAT
+      - name: vendor_id
+        description: A code indicating the TLC vendor that provided the record.
+        data_type: INT
+      - name: cbd_congestion_fee
+        description: The congestion fee amount for trips that originate, terminate, or pass through the
+          Manhattan congestion pricing zone. This fee is in addition to the $2.50 congestion surcharge. 
+        data_type: FLOAT
+      - name: trip_duration
+        description: The duration of the trip in minutes, calculated as the difference between
+          tpep_dropoff_datetime and tpep_pickup_datetime.
+        data_type: FLOAT
+      - name: trip_speed
+        description: The average speed of the trip in miles per hour, calculated as
+          (trip_distance / trip_duration) * 60.
+        data_type: INT
+      - name: tip_ratio_pct
+        description: The ratio of tip_amount to fare_amount, expressed as a percentage.
+        data_type: FLOAT
+      
